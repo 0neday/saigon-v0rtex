@@ -13,7 +13,7 @@
 #include "v0rtex.h"
 #include "Utilities.h"
 #include "unjail.h"
-#include "kppless.h"
+//#include "kppless.h"
 
 @interface SaigonViewController : UIViewController
 @property (retain, nonatomic) IBOutlet UIButton *helpButton;
@@ -37,7 +37,6 @@
 @implementation SaigonViewController
 
 bool autoRespring = false;
-int reinstallCydia = 1; // false by default
 
 NSString *error_message;
 
@@ -109,25 +108,19 @@ NSString *error_message;
 }
 
 - (IBAction)jailbreakHold:(id)sender {
-    
-    if(reinstallCydia == 1 && is_cydia_installed() == 1) {
-        
-        printf("[INFO]: will reinstall Cydia\n");
-        reinstallCydia = 0;
-        
-
-        [self.warningLabel setHidden:NO];
-        
-        [UIView animateWithDuration:0.9 animations:^{
-            [self.warningLabel setAlpha:0.30];
-        } completion:^(BOOL finished){
-            [self.warningLabel setAlpha:0];
-        }];
-        
-    }
-    
+	
+		[self.progressView setProgress:1.0 animated:YES];
+		[self respring];
+	
+		[self.warningLabel setHidden:NO];
+		
+		[UIView animateWithDuration:0.9 animations:^{
+			[self.warningLabel setAlpha:0.30];
+		} completion:^(BOOL finished){
+			[self.warningLabel setAlpha:0];
+		}];
+	
 }
-
 
 - (IBAction)jailbreakReleased:(id)sender {
 
@@ -172,7 +165,6 @@ NSString *error_message;
 }
 
 
-
 - (void) show_kpp_bypass {
     
     [self.progressView setProgress:0.7 animated:YES];
@@ -181,7 +173,7 @@ NSString *error_message;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         
         if (go_extra_recipe() == KERN_SUCCESS) {
-            [self show_install_cydia];
+            [self show_load_payload];
         } else {
             // show failure (bypassing KPP)
             error_message = @"bypassing KPP";
@@ -196,55 +188,25 @@ NSString *error_message;
     });
 }
 
-- (void) show_kppless {
-    
-    [self.progressView setProgress:0.9 animated:YES];
-    [self.jailbreakButton setTitle:@"going kppless" forState:UIControlStateNormal];
-    [self.warningLabel setHidden:YES];
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
 
-        if (go_kppless() == KERN_SUCCESS) {
-            
-            [self.progressView setProgress:1.0 animated:YES];
-            [self respring];
-            
-        } else {
-            // show failure (going kppless)
-            error_message = @"going kppless";
-            [self show_failure];
-        }
-        
-    });
-    
-}
-
-- (void) show_install_cydia {
-    
-    int cydia_installed = is_cydia_installed();
-    
-    if (cydia_installed == 0 || reinstallCydia == 0) {
-        [self.jailbreakButton setTitle:@"installing Cydia" forState:UIControlStateNormal];
-        reinstallCydia = 0; // install Cydia
-    } else {
-        [self.jailbreakButton setTitle:@"respringing" forState:UIControlStateNormal];
-    }
-    
+- (void) show_load_payload {
+		// loading payload for developer
+		[self.jailbreakButton setTitle:@"Loading payload" forState:UIControlStateNormal];
     [self.progressView setProgress:0.9 animated:YES];
     [self.warningLabel setHidden:YES];
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
 
-        // Untar bootstrap & install Cydia (final step)
-        if (install_cydia(reinstallCydia) == KERN_SUCCESS) {
+        // Untar bootstrap.tar and launch dropbear
+        if (load_payload(1) == KERN_SUCCESS) {
             
             [self.progressView setProgress:1.0 animated:YES];
-            [self respring];
-            
+						[self.jailbreakButton setTitle:@"you're already jailbroken" forState:UIControlStateDisabled];
+            //[self respring];
 
         } else {
-            // show failure (installing Cydia)
-            error_message = @"installing Cydia";
+            // show failure
+            error_message = @"Loading payload";
             [self show_failure];
         }
         
@@ -260,13 +222,11 @@ NSString *error_message;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.0 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         
         [UIView animateWithDuration:2.0 animations:^{
-            [self.view setAlpha:0];
+           // [self.view setAlpha:0];
         } completion:^(BOOL finished){
-            if(finished)
-                kill_backboardd();
+							//kill_backboardd();
         }];
     });
-    
 }
 
 - (void) show_failure {

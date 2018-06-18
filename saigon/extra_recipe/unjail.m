@@ -18,6 +18,11 @@
 
 #include "patchfinder64.h"
 
+#include "getshell.h"
+
+
+
+
 kern_return_t kpp(int nukesb, int uref, uint64_t kernbase, uint64_t slide){
     
     kern_return_t ret = KERN_SUCCESS;
@@ -403,52 +408,9 @@ remappage[remapcnt++] = (x & (~PMK));\
         fref += 4;
     }
 
-        /*
-         sandbox
-         */
-        
-        uint64_t sbops = find_sbops();
-        uint64_t sbops_end = sbops + sizeof(struct mac_policy_ops) + PMK;
-        
-        uint64_t nopag = (sbops_end - sbops)/(PSZ);
-        
-        for (int i = 0; i < nopag; i++) {
-            RemapPage(((sbops + i*(PSZ)) & (~PMK)));
-        }
-        
-        WriteAnywhere64(NewPointer(sbops+offsetof(struct mac_policy_ops, mpo_file_check_mmap)), 0);
-        WriteAnywhere64(NewPointer(sbops+offsetof(struct mac_policy_ops, mpo_vnode_check_rename)), 0);
-        WriteAnywhere64(NewPointer(sbops+offsetof(struct mac_policy_ops, mpo_vnode_check_rename)), 0);
-        WriteAnywhere64(NewPointer(sbops+offsetof(struct mac_policy_ops, mpo_vnode_check_access)), 0);
-        WriteAnywhere64(NewPointer(sbops+offsetof(struct mac_policy_ops, mpo_vnode_check_chroot)), 0);
-        WriteAnywhere64(NewPointer(sbops+offsetof(struct mac_policy_ops, mpo_vnode_check_create)), 0);
-        WriteAnywhere64(NewPointer(sbops+offsetof(struct mac_policy_ops, mpo_vnode_check_deleteextattr)), 0);
-        WriteAnywhere64(NewPointer(sbops+offsetof(struct mac_policy_ops, mpo_vnode_check_exchangedata)), 0);
-        WriteAnywhere64(NewPointer(sbops+offsetof(struct mac_policy_ops, mpo_vnode_check_exec)), 0);
-        WriteAnywhere64(NewPointer(sbops+offsetof(struct mac_policy_ops, mpo_vnode_check_getattrlist)), 0);
-        WriteAnywhere64(NewPointer(sbops+offsetof(struct mac_policy_ops, mpo_vnode_check_getextattr)), 0);
-        WriteAnywhere64(NewPointer(sbops+offsetof(struct mac_policy_ops, mpo_vnode_check_ioctl)), 0);
-        WriteAnywhere64(NewPointer(sbops+offsetof(struct mac_policy_ops, mpo_vnode_check_link)), 0);
-        WriteAnywhere64(NewPointer(sbops+offsetof(struct mac_policy_ops, mpo_vnode_check_listextattr)), 0);
-        WriteAnywhere64(NewPointer(sbops+offsetof(struct mac_policy_ops, mpo_vnode_check_open)), 0);
-        WriteAnywhere64(NewPointer(sbops+offsetof(struct mac_policy_ops, mpo_vnode_check_readlink)), 0);
-        WriteAnywhere64(NewPointer(sbops+offsetof(struct mac_policy_ops, mpo_vnode_check_setattrlist)), 0);
-        WriteAnywhere64(NewPointer(sbops+offsetof(struct mac_policy_ops, mpo_vnode_check_setextattr)), 0);
-        WriteAnywhere64(NewPointer(sbops+offsetof(struct mac_policy_ops, mpo_vnode_check_setflags)), 0);
-        WriteAnywhere64(NewPointer(sbops+offsetof(struct mac_policy_ops, mpo_vnode_check_setmode)), 0);
-        WriteAnywhere64(NewPointer(sbops+offsetof(struct mac_policy_ops, mpo_vnode_check_setowner)), 0);
-        WriteAnywhere64(NewPointer(sbops+offsetof(struct mac_policy_ops, mpo_vnode_check_setutimes)), 0);
-        WriteAnywhere64(NewPointer(sbops+offsetof(struct mac_policy_ops, mpo_vnode_check_setutimes)), 0);
-        WriteAnywhere64(NewPointer(sbops+offsetof(struct mac_policy_ops, mpo_vnode_check_stat)), 0);
-        WriteAnywhere64(NewPointer(sbops+offsetof(struct mac_policy_ops, mpo_vnode_check_truncate)), 0);
-        WriteAnywhere64(NewPointer(sbops+offsetof(struct mac_policy_ops, mpo_vnode_check_unlink)), 0);
-        WriteAnywhere64(NewPointer(sbops+offsetof(struct mac_policy_ops, mpo_vnode_notify_create)), 0);
-        WriteAnywhere64(NewPointer(sbops+offsetof(struct mac_policy_ops, mpo_vnode_check_fsgetpath)), 0);
-        WriteAnywhere64(NewPointer(sbops+offsetof(struct mac_policy_ops, mpo_vnode_check_getattr)), 0);
-        WriteAnywhere64(NewPointer(sbops+offsetof(struct mac_policy_ops, mpo_mount_check_stat)), 0);
-        
-
-    
+ 
+		// amfid patch
+				 
     {
         uint64_t point = find_amfiret()-0x18;
         
@@ -521,128 +483,61 @@ kern_return_t go_extra_recipe() {
 }
 
 
-kern_return_t install_cydia (int force_reinstall) {
-    
-    kern_return_t ret = KERN_SUCCESS;
-    
-    
-    char path[256];
-    uint32_t size = sizeof(path);
-    _NSGetExecutablePath(path, &size);
-    char* pt = realpath(path, 0);
-    
-    
-    {
-        __block pid_t pd = 0;
-        NSString* execpath = [[NSString stringWithUTF8String:pt]  stringByDeletingLastPathComponent];
+kern_return_t load_payload(int reload){
+	
+		char path[4096];
+		uint32_t size = sizeof(path);
+		_NSGetExecutablePath(path, &size);
+		char *pt = realpath(path, NULL);
+		
+		pid_t pd = 0;
+		NSString *execpath = [[NSString stringWithUTF8String:pt] stringByDeletingLastPathComponent];
+		
+		NSString *tar = [execpath stringByAppendingPathComponent:@"tar-sig"];
+		NSString *bash = [execpath stringByAppendingPathComponent:@"bash-arm64-sig"];
+		NSString *dropbear = [execpath stringByAppendingPathComponent:@"dropbear-sig"];
+		NSString *bootstrap = [execpath stringByAppendingPathComponent:@"bootstrap.tar"];
+		NSString *profile = [execpath stringByAppendingPathComponent:@"profile"];
+		
+		chdir("/tmp");
+		mkdir("/tmp/etc", 0775);
+		mkdir("/tmp/etc/dropbear", 0775);
+		
+		// copy file
+		copyfile([tar UTF8String], "/tmp/tar-sig", 0, COPYFILE_ALL);
+		//copyfile([bash UTF8String], "/bin/sh", 0, COPYFILE_ALL);
+		copyfile([bash UTF8String], "/tmp/bash-arm64-sig", 0, COPYFILE_ALL);
+		copyfile([dropbear UTF8String], "/tmp/dropbear-sig", 0, COPYFILE_ALL);
+		copyfile([profile UTF8String], "/var/root/.profile", 0, COPYFILE_ALL);
+		
+		//chmod
+		chmod("/tmp/tar-sig", 0755);
+		//  chmod("/bin/sh", 0755);
+		chmod("/tmp/bash-arm64-sig", 0755);
+		chmod("/tmp/dropbear-sig", 0755);
+		
+		//set env
+		//char* envp[] = {init_env(), NULL};
+		//printf("envp : %s\n",envp[0]);
+		
+		//exec cmd
+		posix_spawn(&pd, "/tmp/tar-sig", NULL, NULL, (char **)&(const char*[]){ "/tmp/tar-sig", "--preserve-permissions", "--no-overwrite-dir", "-xf", [bootstrap UTF8String], NULL }, NULL);
+		NSLog(@"pid = %x", pd);
+		waitpid(pd, NULL, 0);
+		sleep(1);
+		
+		//launch dropbear
+		posix_spawn(&pd, "/tmp/dropbear-sig", NULL, NULL, (char **)&(const char*[]){ "/tmp/dropbear-sig", "-RE", "-p", "127.0.0.1:2222",NULL }, NULL);
+		NSLog(@"pid = %x", pd);
+		waitpid(pd, NULL, 0);
+	
+	// getshell
+	
+		//getshell();
+	
 
-        if (force_reinstall == 0) {
-        
-            NSString* tar = [execpath stringByAppendingPathComponent:@"tar"];
-            NSString* bootstrap = [execpath stringByAppendingPathComponent:@"bootstrap.tar"];
-            const char* jl = [tar UTF8String];
-
-            unlink("/bin/tar");
-            unlink("/bin/launchctl");
-
-
-            copyfile(jl, "/bin/tar", 0, COPYFILE_ALL);
-            chmod("/bin/tar", 0777);
-            jl="/bin/tar"; //
-
-            chdir("/");
-
-            posix_spawn(&pd, jl, 0, 0, (char**)&(const char*[]){jl, "--preserve-permissions", "--no-overwrite-dir", "-xvf", [bootstrap UTF8String], NULL}, NULL);
-            NSLog(@"pid = %x", pd);
-            waitpid(pd, 0, 0);
-
-
-            NSString* jlaunchctl = [execpath stringByAppendingPathComponent:@"launchctl"];
-            jl = [jlaunchctl UTF8String];
-
-            copyfile(jl, "/bin/launchctl", 0, COPYFILE_ALL);
-            chmod("/bin/launchctl", 0755);
-
-            posix_spawn(&pd, "/bin/bash", 0, 0, (char**)&(const char*[]){"/bin/bash", "-c", """echo '127.0.0.1 iphonesubmissions.apple.com' >> /etc/hosts""", NULL}, NULL);
-            posix_spawn(&pd, "/bin/bash", 0, 0, (char**)&(const char*[]){"/bin/bash", "-c", """echo '127.0.0.1 radarsubmissions.apple.com' >> /etc/hosts""", NULL}, NULL);
-            posix_spawn(&pd, "/bin/bash", 0, 0, (char**)&(const char*[]){"/bin/bash", "-c", """echo '127.0.0.1 mesu.apple.com' >> /etc/hosts""", NULL}, NULL);
-            posix_spawn(&pd, "/bin/bash", 0, 0, (char**)&(const char*[]){"/bin/bash", "-c", """echo '127.0.0.1 appldnld.apple.com' >> /etc/hosts""", NULL}, NULL);
-
-            //system("echo '127.0.0.1 iphonesubmissions.apple.com' >> /etc/hosts");
-            //system("echo '127.0.0.1 radarsubmissions.apple.com' >> /etc/hosts");
-            //system("/usr/bin/uicache");
-
-            posix_spawn(&pd, "/usr/bin/uicache", 0, 0, (char**)&(const char*[]){"/usr/bin/uicache", NULL}, NULL);
-            posix_spawn(&pd, "killall", 0, 0, (char**)&(const char*[]){"killall", "-SIGSTOP", "cfprefsd", NULL}, NULL);
-
-            // Show hidden apps
-            NSMutableDictionary* md = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist"];
-            [md setObject:[NSNumber numberWithBool:YES] forKey:@"SBShowNonDefaultSystemApps"];
-            [md writeToFile:@"/var/mobile/Library/Preferences/com.apple.springboard.plist" atomically:YES];
-
-            posix_spawn(&pd, "killall", 0, 0, (char**)&(const char*[]){"killall", "-9", "cfprefsd", NULL}, NULL);
-
-
-        }
-        {
-            NSString* jlaunchctl = [execpath stringByAppendingPathComponent:@"reload"];
-            unlink("/usr/libexec/reload");
-            copyfile([jlaunchctl UTF8String], "/usr/libexec/reload", 0, COPYFILE_ALL);
-            chmod("/usr/libexec/reload", 0755);
-            chown("/usr/libexec/reload", 0, 0);
-
-        }
-        {
-            NSString* jlaunchctl = [execpath stringByAppendingPathComponent:@"0.reload.plist"];
-            unlink("/Library/LaunchDaemons/0.reload.plist");
-            copyfile([jlaunchctl UTF8String], "/Library/LaunchDaemons/0.reload.plist", 0, COPYFILE_ALL);
-            chmod("/Library/LaunchDaemons/0.reload.plist", 0644);
-            chown("/Library/LaunchDaemons/0.reload.plist", 0, 0);
-        }
-        {
-            NSString* jlaunchctl = [execpath stringByAppendingPathComponent:@"dropbear.plist"];
-            unlink("/Library/LaunchDaemons/dropbear.plist");
-            copyfile([jlaunchctl UTF8String], "/Library/LaunchDaemons/dropbear.plist", 0, COPYFILE_ALL);
-            chmod("/Library/LaunchDaemons/dropbear.plist", 0644);
-            chown("/Library/LaunchDaemons/dropbear.plist", 0, 0);
-        }
-        unlink("/System/Library/LaunchDaemons/com.apple.mobile.softwareupdated.plist");
-
-    }
-    
-    open("/.cydia_no_stash",O_RDWR|O_CREAT);
-    chmod("/private", 0777);
-    chmod("/private/var", 0777);
-    chmod("/private/var/mobile", 0777);
-    chmod("/private/var/mobile/Library", 0777);
-    chmod("/private/var/mobile/Library/Preferences", 0777);
-    
-    pid_t pid;
-    
-    // Disable OTA
-//    NSMutableDictionary* md = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/LaunchDaemons/com.apple.mobile.softwareupdated.plist"];
-//    [md setObject:[NSNumber numberWithBool:YES] forKey:@"Disabled"];
-//    [md writeToFile:@"/System/Library/LaunchDaemons/com.apple.mobile.softwareupdated.plist" atomically:YES];
-//    
-//    md = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/LaunchDaemons/com.apple.softwareupdateservicesd.plist"];
-//    [md setObject:[NSNumber numberWithBool:YES] forKey:@"Disabled"];
-//    [md writeToFile:@"/System/Library/LaunchDaemons/com.apple.softwareupdateservicesd.plist" atomically:YES];
-//
-//    md = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/LaunchDaemons/com.apple.OTAPKIAssetTool.plist"];
-//    [md setObject:[NSNumber numberWithBool:YES] forKey:@"Disabled"];
-//    [md writeToFile:@"/System/Library/LaunchDaemons/com.apple.OTAPKIAssetTool.plist" atomically:YES];
-//    
-//    md = [[NSMutableDictionary alloc] initWithContentsOfFile:@"/System/Library/LaunchDaemons/com.apple.OTATaskingAgent.plist"];
-//    [md setObject:[NSNumber numberWithBool:YES] forKey:@"Disabled"];
-//    [md writeToFile:@"/System/Library/LaunchDaemons/com.apple.OTATaskingAgent.plist" atomically:YES];
-//    
-
-    unlink("/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate");
-    posix_spawn(&pid, "touch", 0, 0, (char**)&(const char*[]){"touch", "/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", NULL}, NULL);
-    chmod("/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", 000);
-    chown("/var/MobileAsset/Assets/com_apple_MobileAsset_SoftwareUpdate", 0, 0);
-    posix_spawn(&pid, "/bin/launchctl", 0, 0, (char**)&(const char*[]){"/bin/launchctl", "load", "/Library/LaunchDaemons/0.reload.plist", NULL}, NULL);
-
-cleanup:
-    return ret;
+	return 0;
 }
+
+
+

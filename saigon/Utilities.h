@@ -37,9 +37,9 @@ typedef uint32_t kptr_t;
 
 char * get_internal_model_name();
 int ami_jailbroken();
-int is_cydia_installed();
 kern_return_t offsets_init();
 
 void kill_backboardd();
+int is_cydia_installed();
 
 #endif /* Utilities_h */

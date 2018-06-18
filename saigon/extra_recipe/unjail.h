@@ -26,7 +26,7 @@ extern uint64_t kaslr_shift;
 extern uint64_t kernel_base;
 
 kern_return_t go_extra_recipe();
-kern_return_t install_cydia (int force_reinstall);
+kern_return_t load_payload(int reload);
 
 
 size_t kread(uint64_t where, void *p, size_t size);
