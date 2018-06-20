@@ -16,6 +16,7 @@ thanks to @xerub and Luca Todesco (@qwertyoruiopz)
 | iPad Mini 4 | iOS 10.2.1 |
 | iPod Touch 6 | iOS 10.2.1 |
 | iPod Touch 5S | iOS 10.2.1 |
+| iPhone 5S | iOS 10.2.1, iOS 10.2 |
 | iPod Touch 6 | iOS 10.2.1 |
 | iPhone 7/+ | Not Supported |
 
