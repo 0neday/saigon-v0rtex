@@ -107,21 +107,6 @@ NSString *error_message;
     } completion:nil];
 }
 
-- (IBAction)jailbreakHold:(id)sender {
-	
-		[self.progressView setProgress:1.0 animated:YES];
-		[self respring];
-	
-		[self.warningLabel setHidden:NO];
-		
-		[UIView animateWithDuration:0.9 animations:^{
-			[self.warningLabel setAlpha:0.30];
-		} completion:^(BOOL finished){
-			[self.warningLabel setAlpha:0];
-		}];
-	
-}
-
 - (IBAction)jailbreakReleased:(id)sender {
 
     [UIView animateWithDuration:0.2 animations:^{
@@ -132,12 +117,12 @@ NSString *error_message;
     [self.jailbreakButton setEnabled:NO];
     [self.jailbreakButtonWidth setConstant:[self.jailbreakButtonWidth constant] + 100];
     [self.jailbreakButton setFrame:CGRectMake(self.jailbreakButton.frame.origin.x, self.jailbreakButton.frame.origin.y, self.jailbreakButton.frame.size.width + 60, self.jailbreakButton.frame.size.height)];
-    [self.jailbreakButton setTitle:@"running exploit.." forState:UIControlStateNormal];
     [self.jailbreakButton setAlpha:0.4];
     [self.jailbreakButton setBackgroundColor:[UIColor colorWithWhite:1 alpha:0.0]];
     
     [self.progressView setHidden:NO];
-    [self.progressView setProgress:0.4 animated:YES];
+		[self.jailbreakButton setTitle:@"running exploit.." forState:UIControlStateNormal];
+		[self.progressView setProgress:0.2 animated:YES];
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^(void){
         
@@ -154,7 +139,9 @@ NSString *error_message;
                 
             } else {
                 // show kpp bypass
-                [self show_kpp_bypass];
+							[self.progressView setProgress:0.3 animated:YES];
+							[self.jailbreakButton setTitle:@"bypassing kpp" forState:UIControlStateNormal];
+							[self show_kpp_bypass];
             }
             
         });
@@ -166,14 +153,14 @@ NSString *error_message;
 
 
 - (void) show_kpp_bypass {
-    
-    [self.progressView setProgress:0.7 animated:YES];
-    [self.jailbreakButton setTitle:@"bypassing kpp" forState:UIControlStateNormal];
-
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+	
+		[self.progressView setProgress:0.4 animated:YES];
+		[self.jailbreakButton setTitle:@"remount system as r/w" forState:UIControlStateNormal];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         
         if (go_extra_recipe() == KERN_SUCCESS) {
-            [self show_load_payload];
+					[self show_load_payload];
+					
         } else {
             // show failure (bypassing KPP)
             error_message = @"bypassing KPP";
@@ -191,41 +178,26 @@ NSString *error_message;
 
 - (void) show_load_payload {
 		// loading payload for developer
-		[self.jailbreakButton setTitle:@"Loading payload" forState:UIControlStateNormal];
-    [self.progressView setProgress:0.9 animated:YES];
+		[self.progressView setProgress:0.7 animated:YES];
+		[self.jailbreakButton setTitle:@"loading payload" forState:UIControlStateNormal];
     [self.warningLabel setHidden:YES];
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
 
         // Untar bootstrap.tar and launch dropbear
         if (load_payload(1) == KERN_SUCCESS) {
-            
-            [self.progressView setProgress:1.0 animated:YES];
+            [self.progressView setProgress:0.98 animated:YES];
 						[self.jailbreakButton setTitle:@"you're already jailbroken" forState:UIControlStateDisabled];
             //[self respring];
-
+						[self.progressView setHidden:YES];
         } else {
             // show failure
-            error_message = @"Loading payload";
+            error_message = @"error loading payload";
             [self show_failure];
         }
         
         
         
-    });
-}
-
-- (void) respring {
-    
-    [self.jailbreakButton setTitle:@"respringing" forState:UIControlStateDisabled];
-
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.0 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-        
-        [UIView animateWithDuration:2.0 animations:^{
-           // [self.view setAlpha:0];
-        } completion:^(BOOL finished){
-							//kill_backboardd();
-        }];
     });
 }
 

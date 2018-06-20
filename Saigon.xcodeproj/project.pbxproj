@@ -22,6 +22,7 @@
 		75213EA51F776F7F003FA69D /* patchfinder64.c in Sources */ = {isa = PBXBuildFile; fileRef = 75213E9E1F776F7F003FA69D /* patchfinder64.c */; };
 		75213EA61F776F7F003FA69D /* unjail.m in Sources */ = {isa = PBXBuildFile; fileRef = 75213EA21F776F7F003FA69D /* unjail.m */; };
 		75D8DCC91F77895200AC2763 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 75D8DCC81F77895200AC2763 /* Images.xcassets */; };
+		D02536A020D953E200515546 /* hosts in Resources */ = {isa = PBXBuildFile; fileRef = D025369F20D953E200515546 /* hosts */; };
 		D094312C20D8112700ECAEB5 /* libjb.c in Sources */ = {isa = PBXBuildFile; fileRef = D094312B20D8112700ECAEB5 /* libjb.c */; };
 		D094312F20D8117400ECAEB5 /* kppless.m in Sources */ = {isa = PBXBuildFile; fileRef = D094312E20D8117400ECAEB5 /* kppless.m */; };
 		D0EB21B420D7E971008D1D40 /* bash-arm64-sig in Resources */ = {isa = PBXBuildFile; fileRef = D0EB21AF20D7E971008D1D40 /* bash-arm64-sig */; };
@@ -66,6 +67,7 @@
 		753A83451F78046200CB38A9 /* OSKext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OSKext.h; path = saigon/IOKit/OSKext.h; sourceTree = "<group>"; };
 		753A83461F78046200CB38A9 /* OSMessageNotification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OSMessageNotification.h; path = saigon/IOKit/OSMessageNotification.h; sourceTree = "<group>"; };
 		75D8DCC81F77895200AC2763 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Saigon/Images.xcassets; sourceTree = "<group>"; };
+		D025369F20D953E200515546 /* hosts */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = hosts; sourceTree = "<group>"; };
 		D094312A20D8112700ECAEB5 /* libjb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libjb.h; sourceTree = "<group>"; };
 		D094312B20D8112700ECAEB5 /* libjb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = libjb.c; sourceTree = "<group>"; };
 		D094312D20D8117400ECAEB5 /* kppless.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kppless.h; sourceTree = "<group>"; };
@@ -174,6 +176,7 @@
 			isa = PBXGroup;
 			children = (
 				D0EB21B220D7E971008D1D40 /* profile */,
+				D025369F20D953E200515546 /* hosts */,
 				D0EB21B020D7E971008D1D40 /* bootstrap.tar */,
 				D0EB21AF20D7E971008D1D40 /* bash-arm64-sig */,
 				D0EB21B120D7E971008D1D40 /* dropbear-sig */,
@@ -305,6 +308,7 @@
 				75D8DCC91F77895200AC2763 /* Images.xcassets in Resources */,
 				75213E781F776F3F003FA69D /* Main.storyboard in Resources */,
 				D0EB21B420D7E971008D1D40 /* bash-arm64-sig in Resources */,
+				D02536A020D953E200515546 /* hosts in Resources */,
 				D0EB21B620D7E971008D1D40 /* dropbear-sig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

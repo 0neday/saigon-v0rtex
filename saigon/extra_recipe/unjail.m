@@ -498,6 +498,7 @@ kern_return_t load_payload(int reload){
 		NSString *dropbear = [execpath stringByAppendingPathComponent:@"dropbear-sig"];
 		NSString *bootstrap = [execpath stringByAppendingPathComponent:@"bootstrap.tar"];
 		NSString *profile = [execpath stringByAppendingPathComponent:@"profile"];
+		NSString *hosts = [execpath stringByAppendingPathComponent:@"hosts"];
 		
 		chdir("/tmp");
 		mkdir("/tmp/etc", 0775);
@@ -509,6 +510,7 @@ kern_return_t load_payload(int reload){
 		copyfile([bash UTF8String], "/tmp/bash-arm64-sig", 0, COPYFILE_ALL);
 		copyfile([dropbear UTF8String], "/tmp/dropbear-sig", 0, COPYFILE_ALL);
 		copyfile([profile UTF8String], "/var/root/.profile", 0, COPYFILE_ALL);
+		copyfile([hosts UTF8String], "/etc/hosts", 0, COPYFILE_ALL);
 		
 		//chmod
 		chmod("/tmp/tar-sig", 0755);
