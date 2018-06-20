@@ -1,4 +1,4 @@
-# Saïgon jailbreak for iOS 10.2.1
+# Saïgon jailbreak for iOS 10.2.1 / 10.2
 by Abraham Masri @cheesecakeufo - exploit by Siguza (@s1guza)
 
 thanks to @xerub and Luca Todesco (@qwertyoruiopz)
