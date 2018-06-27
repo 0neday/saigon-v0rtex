@@ -594,8 +594,7 @@ init_kernel(addr_t base, const char *filename)
     return 0;
 }
 
-void
-term_kernel(void)
+void term_kernel(void)
 {
     free(kernel);
 }

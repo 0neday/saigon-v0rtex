@@ -9,7 +9,7 @@
 
 #include "unjail.h"
 #include "offsets.h"
-#include "jailbreak.h"
+#include "kernel.h"
 
 #include "Utilities.h"
 // @qwertyoruiop's KPP bypass
@@ -331,7 +331,7 @@ remappage[remapcnt++] = (x & (~PMK));\
     
     RemapPage(release);
     if (NewPointer(release) == (NewPointer(release+11) - 11)) {
-        copyout(NewPointer(release), "SaigonARM", 11); /* saigonarm */
+        copyout(NewPointer(release), "hongs", 11); /* hongs */
     }
     
     
@@ -468,6 +468,7 @@ kern_return_t go_extra_recipe() {
     
     char *nmz = strdup("/dev/disk0s1s1");
     rv = mount("hfs", "/", MNT_UPDATE, (void *)&nmz);
+		printf("rv: %d (flags: 0x%x) %s \n", rv, v_flag, strerror(errno));
     
     if(rv == -1) {
         printf("[ERROR]: could not mount '/': %d\n", rv);

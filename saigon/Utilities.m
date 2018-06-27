@@ -6,7 +6,7 @@
 //
 
 #import "Utilities.h"
-#import "IOKitLib.h"
+//#import "IOKitLib.h"
 
 
 
@@ -33,17 +33,5 @@ int ami_jailbroken () {
     uname(&u);
     
     // Check if 'SaigonARM' in the version (aka. we're jailbroken)
-    return (strstr(u.version, "SaigonARM") != NULL);
+    return (strstr(u.version, "hongs") != NULL);
 }
-
-int is_cydia_installed () {
-    
-    return ([[NSFileManager defaultManager] fileExistsAtPath:@"/Applications/Cydia.app"]);
-
-}
-
-void kill_backboardd() {
-    pid_t pid;
-    posix_spawn(&pid, "killall", 0, 0, (char**)&(const char*[]){"killall", "blackboardd", NULL}, NULL);
-}
-
