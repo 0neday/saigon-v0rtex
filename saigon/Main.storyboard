@@ -30,7 +30,7 @@
                                 <color key="progressTintColor" red="0.16494094533329218" green="0.39600061303462297" blue="0.51849785052910047" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <color key="trackTintColor" white="1" alpha="0.050588688380281688" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </progressView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="partial jailbreak for iOS 10.x by @cheesecakeufo" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BDz-q0-u99">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="partial jailbreak for iOS 10.x by @cheesecakeufo, @hongs" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BDz-q0-u99">
                                 <rect key="frame" x="56" y="258" width="263" height="31.5"/>
                                 <fontDescription key="fontDescription" type="system" weight="light" pointSize="13"/>
                                 <color key="textColor" white="1" alpha="0.48013426987767582" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -81,11 +81,8 @@
                                 <color key="textColor" white="1" alpha="0.48013426987767582" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <imageView userInteractionEnabled="NO" alpha="0.55000000000000004" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="saigon_logo" translatesAutoresizingMaskIntoConstraints="NO" id="hKT-td-Hdi">
-                                <rect key="frame" x="116" y="159" width="143" height="94"/>
-                            </imageView>
                             <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Rgd-Bb-jp9">
-                                <rect key="frame" x="112" y="539" width="150" height="55"/>
+                                <rect key="frame" x="112" y="517" width="150" height="55"/>
                                 <color key="backgroundColor" red="0.059498458546040495" green="0.16548193607177758" blue="0.21695188492063489" alpha="0.84148031345565755" colorSpace="custom" customColorSpace="sRGB"/>
                                 <gestureRecognizers/>
                                 <constraints>
@@ -116,6 +113,9 @@
                                     <outletCollection property="gestureRecognizers" destination="ehK-xN-Y1d" appends="YES" id="o3r-ud-CPS"/>
                                 </connections>
                             </button>
+                            <imageView userInteractionEnabled="NO" alpha="0.55000000000000004" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" image="saigon_logo" translatesAutoresizingMaskIntoConstraints="NO" id="hKT-td-Hdi">
+                                <rect key="frame" x="116" y="135" width="143" height="94"/>
+                            </imageView>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                         <gestureRecognizers/>

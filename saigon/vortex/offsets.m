@@ -261,6 +261,28 @@ void set_n51ap_10_2() {
 	
 }
 
+void set_iphone7_10_3_2() {
+  
+  g_offsets.kernel_base = 0xfffffff025204000; // added
+  g_offsets.kernel_text = 0xFFFFFFF007004000; // added
+  g_offsets.zone_map = 0xFFFFFFF00755A360; // added
+  g_offsets.kernel_map = 0xFFFFFFF0075B6058; // added
+  g_offsets.kernel_task = 0xFFFFFFF0075B6050; // added
+  g_offsets.realhost = 0xFFFFFFF00753CA98; // added
+  g_offsets.bzero = 0xFFFFFFF007082140; // added
+  g_offsets.bcopy = 0xFFFFFFF007081F80; // added (_ovbcopy)
+  g_offsets.copyin = 0xfffffff0071835b8; // added
+  g_offsets.copyout = 0xfffffff0071837c0; // added
+  g_offsets.ipc_port_alloc_special = 0xFFFFFFF00709A060; // added
+  g_offsets.ipc_kobject_set = 0xfffffff0070ad6dc; // added
+  g_offsets.ipc_port_make_send = 0xFFFFFFF007099BA4; // added
+  g_offsets.iosurfacerootuserclient_vtable = 0xFFFFFFF006F2CA20; // added
+  g_offsets.ROP_ADD_X0_X0_0x10 = 0xfffffff006531fb0; // added (hex: 00 40 00 91 c0 03 5f d6)
+  
+}
+
+
+
 
 // iPhone 5S (N53AP) - iOS 10.2.1 (14D27)
 void set_n53ap_10_2_1() {

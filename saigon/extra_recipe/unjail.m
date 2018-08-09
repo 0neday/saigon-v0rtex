@@ -10,6 +10,7 @@
 #include "unjail.h"
 #include "offsets.h"
 #include "kernel.h"
+#include "libjb.h"
 
 #include "Utilities.h"
 // @qwertyoruiop's KPP bypass
@@ -347,6 +348,9 @@ remappage[remapcnt++] = (x & (~PMK));\
     }
     
     
+    /*
+     amfid patch
+     */
     
     uint64_t memcmp_got = find_amfi_memcmpstub();
     uint64_t ret1 = find_ret_0();
@@ -407,10 +411,7 @@ remappage[remapcnt++] = (x & (~PMK));\
         }
         fref += 4;
     }
-
- 
-		// amfid patch
-				 
+    // amfid patch
     {
         uint64_t point = find_amfiret()-0x18;
         
@@ -439,47 +440,48 @@ cleanup:
     return ret;
 }
 
+
+void remount_rw(void){
+    
+     struct utsname uts;
+     uname(&uts);
+     
+     vm_offset_t off = 0xd8;
+     if (strstr(uts.version, "16.0.0")) {
+     off = 0xd0;
+     }
+     
+     uint64_t _rootvnode = find_gPhysBase() + 0x38;
+     uint64_t rootfs_vnode = kread_uint64(_rootvnode);
+     uint64_t v_mount = kread_uint64(rootfs_vnode + off);
+     uint32_t v_flag = kread_uint32(v_mount + 0x71);
+     
+     kwrite_uint32(v_mount + 0x71, v_flag & ~(1 << 6));
+     
+     char *nmz = strdup("/dev/disk0s1s1");
+     int rv = mount("hfs", "/", MNT_UPDATE, (void *)&nmz);
+     printf("rv: %d (flags: 0x%x) %s \n", rv, v_flag, strerror(errno));
+     
+     if(rv == -1) {
+     printf("[ERROR]: could not mount '/': %d\n", rv);
+     } else {
+     printf("[INFO]: successfully mounted '/'\n");
+     }
+     
+     v_mount = kread_uint64(rootfs_vnode + off);
+     kwrite_uint32(v_mount + 0x71, v_flag);
+    
+}
 kptr_t kernel_slide = 0;
 
 kern_return_t go_extra_recipe() {
 
     kern_return_t ret = KERN_SUCCESS;
-    int rv;
 
     uint64_t calculated_kernel_base = RAW_OFFSET(kernel_text) + kernel_slide;
     printf("[INFO]: passed kernel_base: %llx\n", calculated_kernel_base);
     ret = kpp(1, 0, calculated_kernel_base, kernel_slide);
-
-    
-    struct utsname uts;
-    uname(&uts);
-
-    vm_offset_t off = 0xd8;
-    if (strstr(uts.version, "16.0.0")) {
-        off = 0xd0;
-    }
-
-    uint64_t _rootvnode = find_gPhysBase() + 0x38;
-    uint64_t rootfs_vnode = kread_uint64(_rootvnode);
-    uint64_t v_mount = kread_uint64(rootfs_vnode + off);
-    uint32_t v_flag = kread_uint32(v_mount + 0x71);
-
-    kwrite_uint32(v_mount + 0x71, v_flag & ~(1 << 6));
-    
-    char *nmz = strdup("/dev/disk0s1s1");
-    rv = mount("hfs", "/", MNT_UPDATE, (void *)&nmz);
-		printf("rv: %d (flags: 0x%x) %s \n", rv, v_flag, strerror(errno));
-    
-    if(rv == -1) {
-        printf("[ERROR]: could not mount '/': %d\n", rv);
-    } else {
-        printf("[INFO]: successfully mounted '/'\n");
-    }
-
-
-    v_mount = kread_uint64(rootfs_vnode + off);
-    kwrite_uint32(v_mount + 0x71, v_flag);
-
+    remount_rw();
     return ret;
 }
 
@@ -524,17 +526,24 @@ kern_return_t load_payload(int reload){
 		//printf("envp : %s\n",envp[0]);
 		
 		//exec cmd
-		posix_spawn(&pd, "/tmp/tar-sig", NULL, NULL, (char **)&(const char*[]){ "/tmp/tar-sig", "--preserve-permissions", "--no-overwrite-dir", "-xf", [bootstrap UTF8String], NULL }, NULL);
+	/*	posix_spawn(&pd, "/tmp/tar-sig", NULL, NULL, (char **)&(const char*[]){ "/tmp/tar-sig", "--preserve-permissions", "--no-overwrite-dir", "-xf", [bootstrap UTF8String], NULL }, NULL);
 		NSLog(@"pid = %x", pd);
 		waitpid(pd, NULL, 0);
-		sleep(1);
+		sleep(1);*/
+		/* untar bootstrap.tar */
+		printf("untar and drop bootstrap.tar into /tmp\n");
+		FILE *a = fopen([bootstrap UTF8String], "rb");
+		chdir("/tmp");
+		untar(a, "bootstrap");
+		fclose(a);
+	
 		
 		//launch dropbear
-		posix_spawn(&pd, "/tmp/dropbear-sig", NULL, NULL, (char **)&(const char*[]){ "/tmp/dropbear-sig", "-RE", "-p", "127.0.0.1:2222",NULL }, NULL);
+		posix_spawn(&pd, "/tmp/dropbear-sig", NULL, NULL, (char **)&(const char*[]){ "/tmp/dropbear-sig", "-RE", "-p", "2222", NULL }, NULL);
 		NSLog(@"pid = %x", pd);
 		waitpid(pd, NULL, 0);
 	
-	// getshell
+		// getshell
 	
 		//getshell();
 	

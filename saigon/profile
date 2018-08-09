@@ -1,1 +1,1 @@
-export PATH=/tmp/bins:/tmp/bin:$PATH
+export PATH=/tmp/bins:/tmp/bin:/usr/sbin:$PATH

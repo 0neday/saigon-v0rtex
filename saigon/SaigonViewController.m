@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-
+#include <sys/sysctl.h>
 
 #include "v0rtex.h"
 #include "Utilities.h"
@@ -33,6 +33,22 @@
 @interface SaigonViewController ()
 
 @end
+#define localize(key) NSLocalizedString(key, @"")
+#define postProgress(prg) [[NSNotificationCenter defaultCenter] postNotificationName: @"JB" object:nil userInfo:@{@"JBProgress": prg}]
+
+double uptime(){
+    struct timeval boottime;
+    size_t len = sizeof(boottime);
+    int mib[2] = { CTL_KERN, KERN_BOOTTIME };
+    if( sysctl(mib, 2, &boottime, &len, NULL, 0) < 0 )
+    {
+        return -1.0;
+    }
+    time_t bsec = boottime.tv_sec, csec = time(NULL);
+    
+    return difftime(csec, bsec);
+}
+
 
 @implementation SaigonViewController
 
@@ -65,6 +81,11 @@ NSString *error_message;
     
     // get device info
     [self.deviceInfoLabel setText:[NSString stringWithFormat:@"%s - %@", get_internal_model_name(), [[UIDevice currentDevice] systemVersion]]];
+    [self.jailbreakButton setEnabled:YES];
+    [self.jailbreakButtonWidth setConstant:[self.jailbreakButtonWidth constant] + 100];
+    [self.jailbreakButton setFrame:CGRectMake(self.jailbreakButton.frame.origin.x, self.jailbreakButton.frame.origin.y, self.jailbreakButton.frame.size.width + 60, self.jailbreakButton.frame.size.height)];
+    [self.jailbreakButton setAlpha:0.4];
+    [self.jailbreakButton setBackgroundColor:[UIColor colorWithWhite:1 alpha:0.0]];
     
     if (ami_jailbroken() == 1) {
         
@@ -76,6 +97,20 @@ NSString *error_message;
         [self.jailbreakButton setBackgroundColor:[UIColor colorWithWhite:1 alpha:0.0]];
         return;
     }
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        int waitTime;
+        while ((waitTime = 90 - uptime()) > 0) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.jailbreakButton setTitle:[NSString stringWithFormat:@"wait: %ds", waitTime] forState:UIControlStateNormal];
+            });
+            sleep(1);
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.jailbreakButton setTitle:@"go" forState:UIControlStateNormal];
+        });
+    });
     
     if (offsets_init() != KERN_SUCCESS) {
         
