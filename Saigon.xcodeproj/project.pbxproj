@@ -28,7 +28,7 @@
 		D027F07820E3A7AE00B5BFA6 /* getshell.c in Sources */ = {isa = PBXBuildFile; fileRef = D027F07720E3A7AE00B5BFA6 /* getshell.c */; };
 		D027F07B20E3A7C400B5BFA6 /* libjb.c in Sources */ = {isa = PBXBuildFile; fileRef = D027F07A20E3A7C400B5BFA6 /* libjb.c */; };
 		D027F07D20E3A89900B5BFA6 /* hosts in Resources */ = {isa = PBXBuildFile; fileRef = D027F07C20E3A89900B5BFA6 /* hosts */; };
-		D083C476212E974B00DDB7E6 /* bootstrap.tar in Resources */ = {isa = PBXBuildFile; fileRef = D083C475212E974B00DDB7E6 /* bootstrap.tar */; };
+		D083C47A212E992E00DDB7E6 /* bootstrap.tar in Resources */ = {isa = PBXBuildFile; fileRef = D083C479212E992E00DDB7E6 /* bootstrap.tar */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -64,7 +64,7 @@
 		D027F07920E3A7C400B5BFA6 /* libjb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libjb.h; path = saigon/libjb.h; sourceTree = "<group>"; };
 		D027F07A20E3A7C400B5BFA6 /* libjb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = libjb.c; path = saigon/libjb.c; sourceTree = "<group>"; };
 		D027F07C20E3A89900B5BFA6 /* hosts */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = hosts; path = saigon/hosts; sourceTree = "<group>"; };
-		D083C475212E974B00DDB7E6 /* bootstrap.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = bootstrap.tar; sourceTree = "<group>"; };
+		D083C479212E992E00DDB7E6 /* bootstrap.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; name = bootstrap.tar; path = saigon/bootstrap.tar; sourceTree = "<group>"; };
 		EA9900E31E1E9F060056FEBD /* Saigon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Saigon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -143,7 +143,7 @@
 			children = (
 				D027F06F20E3A76D00B5BFA6 /* profile */,
 				D027F07C20E3A89900B5BFA6 /* hosts */,
-				D083C475212E974B00DDB7E6 /* bootstrap.tar */,
+				D083C479212E992E00DDB7E6 /* bootstrap.tar */,
 				D027F06C20E3A76D00B5BFA6 /* bash-arm64-sig */,
 				D027F07020E3A76D00B5BFA6 /* dropbear-sig */,
 				D027F06E20E3A76D00B5BFA6 /* tar-sig */,
@@ -260,7 +260,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D083C476212E974B00DDB7E6 /* bootstrap.tar in Resources */,
+				D083C47A212E992E00DDB7E6 /* bootstrap.tar in Resources */,
 				D027F07320E3A76D00B5BFA6 /* tar-sig in Resources */,
 				75D8DCC91F77895200AC2763 /* Images.xcassets in Resources */,
 				75213E781F776F3F003FA69D /* Main.storyboard in Resources */,
