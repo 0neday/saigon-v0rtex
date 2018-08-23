@@ -28,7 +28,7 @@
 		D027F07820E3A7AE00B5BFA6 /* getshell.c in Sources */ = {isa = PBXBuildFile; fileRef = D027F07720E3A7AE00B5BFA6 /* getshell.c */; };
 		D027F07B20E3A7C400B5BFA6 /* libjb.c in Sources */ = {isa = PBXBuildFile; fileRef = D027F07A20E3A7C400B5BFA6 /* libjb.c */; };
 		D027F07D20E3A89900B5BFA6 /* hosts in Resources */ = {isa = PBXBuildFile; fileRef = D027F07C20E3A89900B5BFA6 /* hosts */; };
-		D09A7F99210468E100B9A732 /* bootstrap.tar in Resources */ = {isa = PBXBuildFile; fileRef = D09A7F98210468E100B9A732 /* bootstrap.tar */; };
+		D083C476212E974B00DDB7E6 /* bootstrap.tar in Resources */ = {isa = PBXBuildFile; fileRef = D083C475212E974B00DDB7E6 /* bootstrap.tar */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -64,7 +64,7 @@
 		D027F07920E3A7C400B5BFA6 /* libjb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libjb.h; path = saigon/libjb.h; sourceTree = "<group>"; };
 		D027F07A20E3A7C400B5BFA6 /* libjb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = libjb.c; path = saigon/libjb.c; sourceTree = "<group>"; };
 		D027F07C20E3A89900B5BFA6 /* hosts */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = hosts; path = saigon/hosts; sourceTree = "<group>"; };
-		D09A7F98210468E100B9A732 /* bootstrap.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; name = bootstrap.tar; path = saigon/bootstrap.tar; sourceTree = "<group>"; };
+		D083C475212E974B00DDB7E6 /* bootstrap.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = bootstrap.tar; sourceTree = "<group>"; };
 		EA9900E31E1E9F060056FEBD /* Saigon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Saigon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -143,7 +143,7 @@
 			children = (
 				D027F06F20E3A76D00B5BFA6 /* profile */,
 				D027F07C20E3A89900B5BFA6 /* hosts */,
-				D09A7F98210468E100B9A732 /* bootstrap.tar */,
+				D083C475212E974B00DDB7E6 /* bootstrap.tar */,
 				D027F06C20E3A76D00B5BFA6 /* bash-arm64-sig */,
 				D027F07020E3A76D00B5BFA6 /* dropbear-sig */,
 				D027F06E20E3A76D00B5BFA6 /* tar-sig */,
@@ -260,7 +260,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D09A7F99210468E100B9A732 /* bootstrap.tar in Resources */,
+				D083C476212E974B00DDB7E6 /* bootstrap.tar in Resources */,
 				D027F07320E3A76D00B5BFA6 /* tar-sig in Resources */,
 				75D8DCC91F77895200AC2763 /* Images.xcassets in Resources */,
 				75213E781F776F3F003FA69D /* Main.storyboard in Resources */,
@@ -418,10 +418,10 @@
 					"$(PROJECT_DIR)/saigon/extra_recipe",
 					"$(PROJECT_DIR)",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = cn.njcit.noncesetter;
+				PRODUCT_BUNDLE_IDENTIFIER = cn.njcit.filesiOS;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "65495ed0-49fb-485d-bebd-0055e419818d";
-				PROVISIONING_PROFILE_SPECIFIER = njcitapp_development;
+				PROVISIONING_PROFILE = "4e57c2eb-0262-43de-926d-5ab3b823983d";
+				PROVISIONING_PROFILE_SPECIFIER = filesiOS;
 				USER_HEADER_SEARCH_PATHS = "";
 				VALID_ARCHS = arm64;
 			};
@@ -449,10 +449,10 @@
 					"$(PROJECT_DIR)/saigon/extra_recipe",
 					"$(PROJECT_DIR)",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = cn.njcit.noncesetter;
+				PRODUCT_BUNDLE_IDENTIFIER = cn.njcit.filesiOS;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "2c2730e6-c449-4824-91ac-6481cba39a11";
-				PROVISIONING_PROFILE_SPECIFIER = njcitapp_development;
+				PROVISIONING_PROFILE = "4e57c2eb-0262-43de-926d-5ab3b823983d";
+				PROVISIONING_PROFILE_SPECIFIER = filesiOS;
 				USER_HEADER_SEARCH_PATHS = "";
 				VALID_ARCHS = arm64;
 			};

@@ -98,17 +98,19 @@ NSString *error_message;
         return;
     }
     
+    //wait 90s after restart device
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         int waitTime;
+        [self.jailbreakButton setEnabled:NO];
         while ((waitTime = 90 - uptime()) > 0) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self.jailbreakButton setTitle:[NSString stringWithFormat:@"wait: %ds", waitTime] forState:UIControlStateNormal];
+                [self.jailbreakButton setTitle:[NSString stringWithFormat:@"wait: %d", waitTime] forState:UIControlStateNormal];
             });
             sleep(1);
         }
-        
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.jailbreakButton setTitle:@"go" forState:UIControlStateNormal];
+            [self.jailbreakButton setEnabled:YES];
         });
     });
     
@@ -124,16 +126,6 @@ NSString *error_message;
     }
 
 }
-
-- (IBAction)helpTapped:(id)sender {
-    
-    UIViewController *viewController = [self.storyboard instantiateViewControllerWithIdentifier:@"InfoViewController"];
-    viewController.providesPresentationContextTransitionStyle = YES;
-    viewController.definesPresentationContext = YES;
-    [viewController setModalPresentationStyle:UIModalPresentationOverCurrentContext];
-    [self presentViewController:viewController animated:YES completion:nil];
-}
-
 
 - (IBAction)jailbreakTapped:(id)sender {
     
@@ -250,6 +242,17 @@ NSString *error_message;
     [viewController setModalPresentationStyle:UIModalPresentationOverCurrentContext];
     [self presentViewController:viewController animated:YES completion:nil];
 }
+
+- (IBAction)helpTapped:(id)sender {
+    
+    UIViewController *viewController = [self.storyboard instantiateViewControllerWithIdentifier:@"InfoViewController"];
+    viewController.providesPresentationContextTransitionStyle = YES;
+    viewController.definesPresentationContext = YES;
+    [viewController setModalPresentationStyle:UIModalPresentationOverCurrentContext];
+    [self presentViewController:viewController animated:YES completion:nil];
+}
+
+
 
 - (void)dealloc {
     [_jailbreakButton release];
