@@ -64,7 +64,7 @@ NSString *error_message;
     gradient.frame = view.bounds;
     
     gradient.colors = @[(id)[UIColor colorWithRed:0.07 green:0.30 blue:0.32 alpha:1.0].CGColor, (id)[UIColor colorWithRed:0.04 green:0.16 blue:0.28 alpha:1.0].CGColor];
-
+    
     [view.layer insertSublayer:gradient atIndex:0];
     [self.view insertSubview:view atIndex:0];
     
@@ -74,9 +74,9 @@ NSString *error_message;
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self addGradient];
-
+    
     self.v0rtex_ret = KERN_SUCCESS;
-
+    
     [UIApplication sharedApplication].idleTimerDisabled = YES;
     
     // get device info
@@ -124,7 +124,7 @@ NSString *error_message;
         [self.jailbreakButton setBackgroundColor:[UIColor colorWithWhite:1 alpha:0.0]];
         return;
     }
-
+    
 }
 
 - (IBAction)jailbreakTapped:(id)sender {
@@ -135,7 +135,7 @@ NSString *error_message;
 }
 
 - (IBAction)jailbreakReleased:(id)sender {
-
+    
     [UIView animateWithDuration:0.2 animations:^{
         self.jailbreakButton.transform = CGAffineTransformMakeScale(1, 1);
     } completion:nil];
@@ -148,8 +148,8 @@ NSString *error_message;
     [self.jailbreakButton setBackgroundColor:[UIColor colorWithWhite:1 alpha:0.0]];
     
     [self.progressView setHidden:NO];
-		[self.jailbreakButton setTitle:@"running exploit.." forState:UIControlStateNormal];
-		[self.progressView setProgress:0.2 animated:YES];
+    [self.jailbreakButton setTitle:@"running exploit.." forState:UIControlStateNormal];
+    [self.progressView setProgress:0.2 animated:YES];
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^(void){
         
@@ -166,9 +166,9 @@ NSString *error_message;
                 
             } else {
                 // show kpp bypass
-							[self.progressView setProgress:0.3 animated:YES];
-							[self.jailbreakButton setTitle:@"bypassing kpp" forState:UIControlStateNormal];
-							[self show_kpp_bypass];
+                [self.progressView setProgress:0.3 animated:YES];
+                [self.jailbreakButton setTitle:@"bypassing kpp" forState:UIControlStateNormal];
+                [self show_kpp_bypass];
             }
             
         });
@@ -180,19 +180,19 @@ NSString *error_message;
 
 
 - (void) show_kpp_bypass {
-	
-		[self.progressView setProgress:0.4 animated:YES];
-		[self.jailbreakButton setTitle:@"remount system as r/w" forState:UIControlStateNormal];
+    
+    [self.progressView setProgress:0.4 animated:YES];
+    [self.jailbreakButton setTitle:@"remount system as r/w" forState:UIControlStateNormal];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         
         if (go_extra_recipe() == KERN_SUCCESS) {
-					[self show_load_payload];
-					
+            [self show_load_payload];
+            
         } else {
             // show failure (bypassing KPP)
             error_message = @"bypassing KPP";
             [self show_failure];
-
+            
             // try going kppless then
             //printf("[ERROR]: kpp bypass failed!\n");
             //printf("[INFO]: trying to use kppless method..\n");
@@ -204,19 +204,19 @@ NSString *error_message;
 
 
 - (void) show_load_payload {
-		// loading payload for developer
-		[self.progressView setProgress:0.7 animated:YES];
-		[self.jailbreakButton setTitle:@"loading payload" forState:UIControlStateNormal];
+    // loading payload for developer
+    [self.progressView setProgress:0.7 animated:YES];
+    [self.jailbreakButton setTitle:@"loading payload" forState:UIControlStateNormal];
     [self.warningLabel setHidden:YES];
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-
+        
         // Untar bootstrap.tar and launch dropbear
         if (load_payload(1) == KERN_SUCCESS) {
             [self.progressView setProgress:0.98 animated:YES];
-						[self.jailbreakButton setTitle:@"you're already jailbroken" forState:UIControlStateDisabled];
+            [self.jailbreakButton setTitle:@"you're already jailbroken" forState:UIControlStateDisabled];
             //[self respring];
-						[self.progressView setHidden:YES];
+            [self.progressView setHidden:YES];
         } else {
             // show failure
             error_message = @"error loading payload";

@@ -27,14 +27,14 @@
 kern_return_t kpp(int nukesb, int uref, uint64_t kernbase, uint64_t slide){
     
     kern_return_t ret = KERN_SUCCESS;
-
+    
     checkvad();
     
     uint64_t entryp;
     
     int rv = init_kernel(kernbase, NULL);
     
-
+    
     if(rv != 0) {
         printf("[ERROR]: could not initialize kernel\n");
         ret = KERN_FAILURE;
@@ -343,7 +343,7 @@ remappage[remapcnt++] = (x & (~PMK));\
     {
         uint64_t sysbootnonce = find_sysbootnonce();
         printf("[INFO]: nonce: %x\n", ReadAnywhere32(sysbootnonce));
-                    
+        
         WriteAnywhere32(sysbootnonce, 1);
     }
     
@@ -369,12 +369,12 @@ remappage[remapcnt++] = (x & (~PMK));\
         /* amfi */
         uint64_t sbops = amfiops;
         uint64_t sbops_end = sbops + sizeof(struct mac_policy_ops);
-            
+        
         uint64_t nopag = sbops_end - sbops;
-            
+        
         for (int i = 0; i < nopag; i+= PSZ)
             RemapPage(((sbops + i) & (~PMK)));
-
+        
         WriteAnywhere64(NewPointer(sbops+offsetof(struct mac_policy_ops, mpo_file_check_mmap)), 0);
     }
     
@@ -435,7 +435,7 @@ remappage[remapcnt++] = (x & (~PMK));\
     }
     
     printf("[INFO]: enabled patches\n");
-
+    
 cleanup:
     return ret;
 }
@@ -443,41 +443,41 @@ cleanup:
 
 void remount_rw(void){
     
-     struct utsname uts;
-     uname(&uts);
-     
-     vm_offset_t off = 0xd8;
-     if (strstr(uts.version, "16.0.0")) {
-     off = 0xd0;
-     }
-     
-     uint64_t _rootvnode = find_gPhysBase() + 0x38;
-     uint64_t rootfs_vnode = kread_uint64(_rootvnode);
-     uint64_t v_mount = kread_uint64(rootfs_vnode + off);
-     uint32_t v_flag = kread_uint32(v_mount + 0x71);
-     
-     kwrite_uint32(v_mount + 0x71, v_flag & ~(1 << 6));
-     
-     char *nmz = strdup("/dev/disk0s1s1");
-     int rv = mount("hfs", "/", MNT_UPDATE, (void *)&nmz);
-     printf("rv: %d (flags: 0x%x) %s \n", rv, v_flag, strerror(errno));
-     
-     if(rv == -1) {
-     printf("[ERROR]: could not mount '/': %d\n", rv);
-     } else {
-     printf("[INFO]: successfully mounted '/'\n");
-     }
-     
-     v_mount = kread_uint64(rootfs_vnode + off);
-     kwrite_uint32(v_mount + 0x71, v_flag);
+    struct utsname uts;
+    uname(&uts);
+    
+    vm_offset_t off = 0xd8;
+    if (strstr(uts.version, "16.0.0")) {
+        off = 0xd0;
+    }
+    
+    uint64_t _rootvnode = find_gPhysBase() + 0x38;
+    uint64_t rootfs_vnode = kread_uint64(_rootvnode);
+    uint64_t v_mount = kread_uint64(rootfs_vnode + off);
+    uint32_t v_flag = kread_uint32(v_mount + 0x71);
+    
+    kwrite_uint32(v_mount + 0x71, v_flag & ~(1 << 6));
+    
+    char *nmz = strdup("/dev/disk0s1s1");
+    int rv = mount("hfs", "/", MNT_UPDATE, (void *)&nmz);
+    printf("rv: %d (flags: 0x%x) %s \n", rv, v_flag, strerror(errno));
+    
+    if(rv == -1) {
+        printf("[ERROR]: could not mount '/': %d\n", rv);
+    } else {
+        printf("[INFO]: successfully mounted '/'\n");
+    }
+    
+    v_mount = kread_uint64(rootfs_vnode + off);
+    kwrite_uint32(v_mount + 0x71, v_flag);
     
 }
 kptr_t kernel_slide = 0;
 
 kern_return_t go_extra_recipe() {
-
+    
     kern_return_t ret = KERN_SUCCESS;
-
+    
     uint64_t calculated_kernel_base = RAW_OFFSET(kernel_text) + kernel_slide;
     printf("[INFO]: passed kernel_base: %llx\n", calculated_kernel_base);
     ret = kpp(1, 0, calculated_kernel_base, kernel_slide);
@@ -487,68 +487,68 @@ kern_return_t go_extra_recipe() {
 
 
 kern_return_t load_payload(int reload){
-	
-		char path[4096];
-		uint32_t size = sizeof(path);
-		_NSGetExecutablePath(path, &size);
-		char *pt = realpath(path, NULL);
-		
-		pid_t pd = 0;
-		NSString *execpath = [[NSString stringWithUTF8String:pt] stringByDeletingLastPathComponent];
-		
-		NSString *tar = [execpath stringByAppendingPathComponent:@"tar-sig"];
-		NSString *bash = [execpath stringByAppendingPathComponent:@"bash-arm64-sig"];
-		NSString *dropbear = [execpath stringByAppendingPathComponent:@"dropbear-sig"];
-		NSString *bootstrap = [execpath stringByAppendingPathComponent:@"bootstrap.tar"];
-		NSString *profile = [execpath stringByAppendingPathComponent:@"profile"];
-		NSString *hosts = [execpath stringByAppendingPathComponent:@"hosts"];
-		
-		chdir("/tmp");
-		mkdir("/tmp/etc", 0775);
-		mkdir("/tmp/etc/dropbear", 0775);
-		
-		// copy file
-		copyfile([tar UTF8String], "/tmp/tar-sig", 0, COPYFILE_ALL);
-		//copyfile([bash UTF8String], "/bin/sh", 0, COPYFILE_ALL);
-		copyfile([bash UTF8String], "/tmp/bash-arm64-sig", 0, COPYFILE_ALL);
-		copyfile([dropbear UTF8String], "/tmp/dropbear-sig", 0, COPYFILE_ALL);
-		copyfile([profile UTF8String], "/var/root/.profile", 0, COPYFILE_ALL);
-		copyfile([hosts UTF8String], "/etc/hosts", 0, COPYFILE_ALL);
-		
-		//chmod
-		chmod("/tmp/tar-sig", 0755);
-		//  chmod("/bin/sh", 0755);
-		chmod("/tmp/bash-arm64-sig", 0755);
-		chmod("/tmp/dropbear-sig", 0755);
-		
-		//set env
-		//char* envp[] = {init_env(), NULL};
-		//printf("envp : %s\n",envp[0]);
-		
-		//exec cmd
-	/*	posix_spawn(&pd, "/tmp/tar-sig", NULL, NULL, (char **)&(const char*[]){ "/tmp/tar-sig", "--preserve-permissions", "--no-overwrite-dir", "-xf", [bootstrap UTF8String], NULL }, NULL);
-		NSLog(@"pid = %x", pd);
-		waitpid(pd, NULL, 0);
-		sleep(1);*/
-		/* untar bootstrap.tar */
-		printf("untar and drop bootstrap.tar into /tmp\n");
-		FILE *a = fopen([bootstrap UTF8String], "rb");
-		chdir("/tmp");
-		untar(a, "bootstrap");
-		fclose(a);
-	
-		
-		//launch dropbear
-		posix_spawn(&pd, "/tmp/dropbear-sig", NULL, NULL, (char **)&(const char*[]){ "/tmp/dropbear-sig", "-RE", "-p", "2222", NULL }, NULL);
-		NSLog(@"pid = %x", pd);
-		waitpid(pd, NULL, 0);
-	
-		// getshell
-	
-		//getshell();
-	
-
-	return 0;
+    
+    char path[4096];
+    uint32_t size = sizeof(path);
+    _NSGetExecutablePath(path, &size);
+    char *pt = realpath(path, NULL);
+    
+    pid_t pd = 0;
+    NSString *execpath = [[NSString stringWithUTF8String:pt] stringByDeletingLastPathComponent];
+    
+    NSString *tar = [execpath stringByAppendingPathComponent:@"tar-sig"];
+    NSString *bash = [execpath stringByAppendingPathComponent:@"bash-arm64-sig"];
+    NSString *dropbear = [execpath stringByAppendingPathComponent:@"dropbear-sig"];
+    NSString *bootstrap = [execpath stringByAppendingPathComponent:@"bootstrap.tar"];
+    NSString *profile = [execpath stringByAppendingPathComponent:@"profile"];
+    NSString *hosts = [execpath stringByAppendingPathComponent:@"hosts"];
+    
+    chdir("/tmp");
+    mkdir("/tmp/etc", 0775);
+    mkdir("/tmp/etc/dropbear", 0775);
+    
+    // copy file
+    copyfile([tar UTF8String], "/tmp/tar-sig", 0, COPYFILE_ALL);
+    //copyfile([bash UTF8String], "/bin/sh", 0, COPYFILE_ALL);
+    copyfile([bash UTF8String], "/tmp/bash-arm64-sig", 0, COPYFILE_ALL);
+    copyfile([dropbear UTF8String], "/tmp/dropbear-sig", 0, COPYFILE_ALL);
+    copyfile([profile UTF8String], "/var/root/.profile", 0, COPYFILE_ALL);
+    copyfile([hosts UTF8String], "/etc/hosts", 0, COPYFILE_ALL);
+    
+    //chmod
+    chmod("/tmp/tar-sig", 0755);
+    //  chmod("/bin/sh", 0755);
+    chmod("/tmp/bash-arm64-sig", 0755);
+    chmod("/tmp/dropbear-sig", 0755);
+    
+    //set env
+    //char* envp[] = {init_env(), NULL};
+    //printf("envp : %s\n",envp[0]);
+    
+    //exec cmd
+    /*	posix_spawn(&pd, "/tmp/tar-sig", NULL, NULL, (char **)&(const char*[]){ "/tmp/tar-sig", "--preserve-permissions", "--no-overwrite-dir", "-xf", [bootstrap UTF8String], NULL }, NULL);
+     NSLog(@"pid = %x", pd);
+     waitpid(pd, NULL, 0);
+     sleep(1);*/
+    /* untar bootstrap.tar */
+    printf("untar and drop bootstrap.tar into /tmp\n");
+    FILE *a = fopen([bootstrap UTF8String], "rb");
+    chdir("/tmp");
+    untar(a, "bootstrap");
+    fclose(a);
+    
+    
+    //launch dropbear
+    posix_spawn(&pd, "/tmp/dropbear-sig", NULL, NULL, (char **)&(const char*[]){ "/tmp/dropbear-sig", "-RE", "-p", "2222", NULL }, NULL);
+    NSLog(@"pid = %x", pd);
+    waitpid(pd, NULL, 0);
+    
+    // getshell
+    
+    //getshell();
+    
+    
+    return 0;
 }
 
 
